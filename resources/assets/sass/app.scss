@@ -67,7 +67,12 @@ p {
         color: #fff;
     }
 }
-
+#logout {
+  cursor: default;
+  &:hover {
+    background-color: transparent;
+  }
+}
 /* form */
 input, textarea, select, .uneditable-input {
   border: 1px solid #bbb;
