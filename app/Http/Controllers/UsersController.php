@@ -13,7 +13,7 @@ class UsersController extends Controller {
     public function __construct() {
         $this->middleware('auth', [
             'except' => [
-                'show', 'create', 'store', 'index','confirmEmail'
+                'show', 'create', 'store', 'index', 'confirmEmail'
             ],
         ]);
         $this->middleware('guest', [
@@ -28,7 +28,10 @@ class UsersController extends Controller {
 
     //个人页
     public function show(User $user) {
-        return view('users.show', compact('user'));
+        $statuses = $user->statuses()
+                ->orderBy('created_at', 'desc')
+                ->paginate(30);
+        return view('users.show', compact('user', 'statuses'));
     }
 
     //注册处理
@@ -100,7 +103,7 @@ class UsersController extends Controller {
             $message->from($from, $name)->to($to)->subject($subject);
         });
     }
-    
+
     public function confirmEmail($token) {
         $user = User::where('activation_token', $token)->firstOrFail();
 
@@ -112,10 +115,9 @@ class UsersController extends Controller {
         session()->flash('success', '恭喜你，激活成功！');
         return redirect()->route('users.show', [$user]);
     }
-    
-    
+
     public function sendPasswordResetNotification($token) {
-         $this->notify(new ResetPassword($token));
+        $this->notify(new ResetPassword($token));
     }
 
 }
