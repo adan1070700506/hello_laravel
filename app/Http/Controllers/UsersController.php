@@ -34,8 +34,11 @@ class UsersController extends Controller {
         return view('users.show', compact('user', 'statuses'));
     }
 
-    //注册处理
-
+    /**
+     * 注册处理
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|void
+     */
     public function store(Request $request) {
 
         $this->validate($request, [
@@ -91,6 +94,10 @@ class UsersController extends Controller {
         return back();
     }
 
+    /**
+     * 发送激活邮件
+     * @param $user 用户实例
+     */
     protected function sendEmailConfirmationTo($user) {
         $view = 'emails.confirm';
         $data = compact('user');
@@ -104,6 +111,11 @@ class UsersController extends Controller {
         });
     }
 
+    /**
+     * 账号激活
+     * @param $token 激活码
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function confirmEmail($token) {
         $user = User::where('activation_token', $token)->firstOrFail();
 
@@ -116,8 +128,20 @@ class UsersController extends Controller {
         return redirect()->route('users.show', [$user]);
     }
 
+
     public function sendPasswordResetNotification($token) {
         $this->notify(new ResetPassword($token));
     }
 
+    public function followings(User $user){
+        $users = $user->followings()->paginate(30);
+        $title = "关注的人";
+        return view('users.show_follow', compact('users', 'title'));
+    }
+
+    public function followers(User $user){
+        $users = $user->followings()->paginate(30);
+        $title = "关注的人";
+        return view('users.show_follow', compact('users', 'title'));
+    }
 }
